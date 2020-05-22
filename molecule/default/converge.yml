@@ -1,0 +1,6 @@
+---
+- name: Converge
+  hosts: all
+
+  tasks:
+    - meta: noop
