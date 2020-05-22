@@ -7,10 +7,23 @@ lint: |
   set -e
   yamllint .
 platforms:
-  - name: instance
-    image: docker.io/pycontribs/centos:7
+  - name: kind-default
+    groups:
+      - k8s
+    image: bsycorp/kind:latest-1.17
+    privileged: true
+    override_command: false
+    exposed_ports:
+      - 8443/tcp
+      - 10080/tcp
+    published_ports:
+      - 0.0.0.0:${TEST_CLUSTER_PORT:-9443}:8443/tcp
     pre_build_image: true
 provisioner:
   name: ansible
+  env:
+    K8S_AUTH_KUBECONFIG: /tmp/molecule/kind-default/kubeconfig
+    KUBECONFIG: /tmp/molecule/kind-default/kubeconfig
+    KIND_PORT: '${TEST_CLUSTER_PORT:-9443}'
 verifier:
   name: ansible

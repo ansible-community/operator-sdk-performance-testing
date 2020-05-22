@@ -2,5 +2,6 @@
 - name: Converge
   hosts: all
 
-  tasks:
-    - meta: noop
+  tasks: []
+
+- import_playbook: ../../main.yml
