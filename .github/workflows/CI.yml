@@ -1,0 +1,32 @@
+---
+name: CI
+'on':
+  push:
+    branches:
+      - master
+  pull_request:
+  schedule:
+    - cron: '0 4 * * *'
+
+jobs:
+
+  kind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code.
+        uses: actions/checkout@v2
+
+      - name: Set up Python.
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: Install ansible and other dependencies.
+        run: pip install ansible yamllint docker molecule openshift
+
+      - name: Run molecule default test scenario.
+        run: molecule test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          SAME_NAME_ROLE_TEST: false
