@@ -23,7 +23,7 @@
         repo: https://github.com/operator-framework/operator-sdk-samples.git
         version: "{{ operator_samples_version }}"
         dest: ./operator-sdk-samples
-        force: yes
+        force: true
 
     - include_tasks: tasks/build-and-deploy-operator.yml
 

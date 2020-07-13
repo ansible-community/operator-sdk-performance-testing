@@ -1,7 +1,7 @@
 ---
 - name: Prepare kubernetes environment
   hosts: k8s
-  gather_facts: no
+  gather_facts: false
 
   vars:
     kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
