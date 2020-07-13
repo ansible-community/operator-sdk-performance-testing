@@ -24,6 +24,8 @@ jobs:
       - name: Install ansible and other dependencies.
         run: pip install ansible yamllint docker molecule openshift
 
+      # TODO: Install operator-sdk.
+
       - name: Run molecule default test scenario.
         run: molecule test
         env:

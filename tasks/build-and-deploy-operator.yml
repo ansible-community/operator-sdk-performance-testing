@@ -1,0 +1,32 @@
+---
+- name: Set the {{ operator_type }} memcached operator image name.
+  set_fact:
+    operator_image: "{{ registry }}/{{ image_name }}-{{ operator_type }}:{{ image_tag }}"
+
+- name: Build the {{ operator_type }} memcached operator image.
+  command: >
+    operator-sdk build {{ operator_image }}
+    chdir=./operator-sdk-samples/{{ operator_type }}/memcached-operator
+
+- name: Push the {{ operator_type }} memcached operator image.
+  command: >
+    docker push {{ operator_image }}
+
+- name: Set the image name appropriately for deploying the operator.
+  replace:
+    path: ./operator-sdk-samples/{{ operator_type }}/memcached-operator/deploy/operator.yaml
+    regexp: REPLACE_IMAGE
+    replace: "{{ operator_image }}"
+
+- name: Apply CRD, RBAC, and Operator, and wait for them to start.
+  k8s:
+    src: "./operator-sdk-samples/{{ operator_type }}/memcached-operator/{{ item }}"
+    state: present
+    namespace: default
+    wait: true
+  loop:
+    - deploy/crds/cache.example.com_memcacheds_crd.yaml
+    - deploy/role.yaml
+    - deploy/role_binding.yaml
+    - deploy/service_account.yaml
+    - deploy/operator.yaml

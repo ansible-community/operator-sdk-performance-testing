@@ -6,7 +6,29 @@
   vars:
     ansible_python_interpreter: '{{ ansible_playbook_python }}'
 
+    # What version of operator-sdk-samples to use for testing.
+    operator_samples_version: v0.18.1
+
+    # Which type of operator we're currently testing.
+    operator_type: ansible
+
+    # Options for the Docker images and registry to use.
+    registry: ttl.sh
+    image_name: operator-sdk-performance-test
+    image_tag: 1h
+
   tasks:
+    - name: Clone the operator-sdk-samples project.
+      git:
+        repo: https://github.com/operator-framework/operator-sdk-samples.git
+        version: "{{ operator_samples_version }}"
+        dest: ./operator-sdk-samples
+        force: yes
+
+    - include_tasks: tasks/build-and-deploy-operator.yml
+
+    # TODO: Create 50 instances and see how long they take to reconcile.
+
     - name: Ensure a pod is running.
       k8s_info:
         kind: Pod
