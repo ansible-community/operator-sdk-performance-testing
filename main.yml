@@ -24,7 +24,15 @@
         repo: https://github.com/operator-framework/operator-sdk-samples.git
         version: "{{ operator_samples_version }}"
         dest: ./operator-sdk-samples
+        mode: 0777
         force: true
+
+    - name: Attempt to fix file permissions.
+      file:
+        dest: ./operator-sdk-samples
+        mode: 0777
+        # mode: 'u=rwX,g=rX,o=rX'
+        recurse: true
 
     - include_tasks: tasks/build-and-deploy-operator.yml
 
