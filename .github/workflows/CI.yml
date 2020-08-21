@@ -36,7 +36,14 @@ jobs:
           chmod +x ansible-operator-${RELEASE_VERSION}-x86_64-linux-gnu && sudo cp ansible-operator-${RELEASE_VERSION}-x86_64-linux-gnu /usr/bin/ansible-operator && rm ansible-operator-${RELEASE_VERSION}-x86_64-linux-gnu
           chmod +x helm-operator-${RELEASE_VERSION}-x86_64-linux-gnu && sudo cp helm-operator-${RELEASE_VERSION}-x86_64-linux-gnu /usr/bin/helm-operator && rm helm-operator-${RELEASE_VERSION}-x86_64-linux-gnu
         env:
-          RELEASE_VERSION: 'v0.19.0'
+          # NOTE: Keep in sync with operator_samples_version in main.yml.
+          RELEASE_VERSION: 'v1.0.0'
+
+      - name: Install kind.
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.8.1/kind-linux-amd64
+          chmod +x ./kind
+          chmod +x ./kind && sudo cp ./kind /usr/bin/kind && rm ./kind
 
       - name: Run molecule default test scenario.
         run: molecule test

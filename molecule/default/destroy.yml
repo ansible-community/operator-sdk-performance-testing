@@ -1,0 +1,9 @@
+---
+- name: Destroy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Destroy test kind cluster
+      command: kind delete cluster --name perftest --kubeconfig {{ kubeconfig }}
