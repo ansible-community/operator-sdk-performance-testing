@@ -14,6 +14,9 @@
     - make deploy
   environment:
     IMG: "{{ operator_image }}"
+    executable: /bin/bash
+
+# TODO: Wait for operator to be 'Running'.
 
 # TODO: Create 50 instances and see how long they take to reconcile.
 
