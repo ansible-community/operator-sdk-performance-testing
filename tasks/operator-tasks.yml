@@ -4,11 +4,12 @@
     operator_image: "{{ registry }}/{{ image_name }}-{{ operator_type }}:{{ image_tag }}"
 
 - name: Build, push, and deploy the {{ operator_type }} memcached operator.
-  command: "{{ item }}"
+  shell: "{{ item }}"
   args:
     chdir: ./operator-sdk-samples/{{ operator_type }}/memcached-operator
   with_items:
-    - make docker-build
+    # Can't use make for docker-build target because of Go operator test dep.
+    - docker build . -t $IMG
     - make docker-push
     - make install
     - make deploy

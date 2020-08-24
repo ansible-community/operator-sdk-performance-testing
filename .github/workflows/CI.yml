@@ -47,9 +47,7 @@ jobs:
 
       - name: Run molecule default test scenario.
         run: molecule test
-        shell: bash
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           SAME_NAME_ROLE_TEST: false
-          
