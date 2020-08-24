@@ -1,0 +1,17 @@
+---
+- name: Download cert-manager manifest.
+  get_url:
+    url: https://github.com/jetstack/cert-manager/releases/download/{{ cert_manager_version }}/cert-manager.yaml
+    dest: /tmp/cert-manager.yaml
+    mode: 0644
+
+- name: Deploy cert-manager into the cluster.
+  k8s:
+    state: present
+    src: /tmp/cert-manager.yaml
+    wait: true
+
+- name: Delete cert-manager manifest.
+  file:
+    path: /tmp/cert-manager.yaml
+    state: absent

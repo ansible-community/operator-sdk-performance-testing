@@ -10,6 +10,16 @@
   with_items:
     - make docker-build
     - make docker-push
+    - make install
     - make deploy
+  environment:
+    IMG: "{{ operator_image }}"
+
+# TODO: Create 50 instances and see how long they take to reconcile.
+
+- name: Undeploy the {{ operator_type }} memcached operator.
+  command: make undeploy
+  args:
+    chdir: ./operator-sdk-samples/{{ operator_type }}/memcached-operator
   environment:
     IMG: "{{ operator_image }}"

@@ -6,7 +6,11 @@ This repository contains some automation code to assist with performance testing
 
 ## Running the test
 
-TODO.
+TODO:
+
+  1. Install [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/).
+  1. Install dependencies: `pip3 install molecule openshift docker`
+  1. Run: `molecule test`
 
 ## Author
 
