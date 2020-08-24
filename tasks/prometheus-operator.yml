@@ -1,0 +1,32 @@
+---
+- name: Download prometheus-operator manifest.
+  get_url:
+    url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/{{ prometheus_operator_version }}/bundle.yaml
+    dest: /tmp/prometheus-operator.yaml
+    mode: 0644
+
+# Without this the operator doesn't deploy successfully on the first go.
+- name: Manually create the prometheus-operator ServiceAccount.
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        labels:
+          app.kubernetes.io/component: controller
+          app.kubernetes.io/name: prometheus-operator
+          app.kubernetes.io/version: v0.41.1
+        name: prometheus-operator
+        namespace: default
+
+- name: Deploy prometheus-operator into the cluster.
+  k8s:
+    state: present
+    src: /tmp/prometheus-operator.yaml
+    wait: true
+
+- name: Delete prometheus-operator manifest.
+  file:
+    path: /tmp/prometheus-operator.yaml
+    state: absent

@@ -1,0 +1,9 @@
+---
+rules:
+  line-length:
+    max: 160
+    level: warning
+
+ignore: |
+  .github/workflows/CI.yml
+  operator-sdk-samples

@@ -6,7 +6,53 @@
   vars:
     ansible_python_interpreter: '{{ ansible_playbook_python }}'
 
+    operators_to_test:
+      - ansible
+      - go
+      - helm
+
+    # What version of operator-sdk-samples to use for testing.
+    # NOTE: Keep in sync with operator RELEASE_VERSION in .github/workflows/CI.
+    operator_samples_version: v1.0.0
+
+    # Options for the Docker images and registry to use.
+    registry: ttl.sh
+    image_name: operator-sdk-performance-test
+    image_tag: 1h
+
+    cert_manager_version: v0.16.1
+    prometheus_operator_version: v0.41.1
+
   tasks:
+    - name: Clone the operator-sdk-samples project.
+      git:
+        repo: https://github.com/operator-framework/operator-sdk-samples.git
+        version: "{{ operator_samples_version }}"
+        dest: ./operator-sdk-samples
+        force: true
+
+    - name: Attempt to fix file permissions.
+      file:
+        dest: ./operator-sdk-samples
+        mode: 0777
+        # mode: 'u=rwX,g=rX,o=rX'
+        recurse: true
+
+    - name: Deploy cert-manager (required for Go operator).
+      include_tasks: tasks/cert-manager.yml
+      when: "'go' in operators_to_test"
+
+    - name: Deploy prometheus-operator (required for Helm operator).
+      include_tasks: tasks/prometheus-operator.yml
+      when: "'helm' in operators_to_test"
+
+    - name: Build, deploy, benchmark, and undeploy operators.
+      include_tasks: tasks/operator-tasks.yml
+      loop: "{{ operators_to_test }}"
+      loop_control:
+        loop_var: operator_type
+
+    # TODO: Just doing this to test the cluster is happy.
     - name: Ensure a pod is running.
       k8s_info:
         kind: Pod
