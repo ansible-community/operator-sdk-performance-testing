@@ -8,6 +8,12 @@
     - name: Create test kind cluster
       command: kind create cluster --name perftest --kubeconfig {{ kubeconfig }}
 
+    - name: Ensure ~/.kube directory exists.
+      file:
+        path: ~/.kube
+        state: directory
+        mode: 0755
+
     - name: Copy kubeconfig into ~/.kube as well.
       copy:
         src: "{{ kubeconfig }}"
