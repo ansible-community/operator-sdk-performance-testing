@@ -7,3 +7,10 @@
   tasks:
     - name: Create test kind cluster
       command: kind create cluster --name perftest --kubeconfig {{ kubeconfig }}
+
+    - name: Copy kubeconfig into ~/.kube as well.
+      copy:
+        src: "{{ kubeconfig }}"
+        dest: ~/.kube/config-perftest
+        remote_src: true
+        mode: 0600

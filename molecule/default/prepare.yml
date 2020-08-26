@@ -1,6 +1,0 @@
----
-- name: Prepare kubernetes environment
-  hosts: k8s
-  gather_facts: false
-
-  tasks: []

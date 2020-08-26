@@ -17,9 +17,27 @@
     IMG: "{{ operator_image }}"
     executable: /bin/bash
 
-# TODO: Wait for operator to be 'Running'.
+- name: Wait for Operator Pod to be 'Running'.
+  k8s_info:
+    api_version: v1
+    kind: Pod
+    label_selectors:
+      - control-plane=controller-manager
+    namespace: memcached-operator-system
+  register: pod
+  until: pod.resources[0].status.phase == 'Running'
+  delay: 3
+  retries: 10
 
-# TODO: Create 50 instances and see how long they take to reconcile.
+# - name: Pause so I can do some testing, poking, and prodding.
+#   pause:
+#     minutes: 30
+
+# TODO: Create 50 CRs, wait for reconciliation to finish, and see how long it
+# took.
+
+# TODO: Kill Operator Pod, wait for it to start again, see how long it takes for
+# it to finish reconciling again.
 
 - name: Undeploy the {{ operator_type }} memcached operator.
   command: make undeploy
