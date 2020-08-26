@@ -51,15 +51,3 @@
       loop: "{{ operators_to_test }}"
       loop_control:
         loop_var: operator_type
-
-    # TODO: Just doing this to test the cluster is happy.
-    - name: Ensure a pod is running.
-      k8s_info:
-        kind: Pod
-        namespace: kube-system
-      register: kube_system_pods
-      until:
-        - kube_system_pods['resources'] is defined
-        - kube_system_pods['resources'][0]['status']['phase'] == 'Running'
-      delay: 5
-      retries: 60
