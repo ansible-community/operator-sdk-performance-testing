@@ -19,6 +19,12 @@ provisioner:
   env:
     K8S_AUTH_KUBECONFIG: ${MOLECULE_EPHEMERAL_DIRECTORY}/kubeconfig
     KUBECONFIG: ${MOLECULE_EPHEMERAL_DIRECTORY}/kubeconfig
+  config_options:
+    defaults:
+      callback_whitelist: profile_tasks
+    callback_profile_tasks:
+      task_output_limit: 100
+      sort_order: none
 scenario:
   test_sequence:
     - lint
