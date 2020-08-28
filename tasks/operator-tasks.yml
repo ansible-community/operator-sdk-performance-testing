@@ -53,7 +53,7 @@
   register: memcached_pods
   until: (memcached_pods.resources | count) == memcached_cr_count
   delay: 5
-  retries: 30
+  retries: 60
 
 - name: Wait for {{ operator_type }} Memcached Pods to be ready.
   command: >
@@ -72,7 +72,3 @@
     chdir: ./operator-sdk-samples/{{ operator_type }}/memcached-operator
   environment:
     IMG: "{{ operator_image }}"
-
-- name: Pause to allow undeploy time to complete.
-  pause:
-    seconds: 10

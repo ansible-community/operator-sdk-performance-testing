@@ -3,7 +3,7 @@
 apiVersion: cache.example.com/v1alpha1
 kind: Memcached
 metadata:
-  name: "{{ 'memcached-%02x' | format(number) }}"
+  name: "{{ 'memcached-%02d' | format(number) }}"
   namespace: default
 spec:
   # See: https://github.com/operator-framework/operator-sdk-samples/issues/154#issuecomment-682169402
