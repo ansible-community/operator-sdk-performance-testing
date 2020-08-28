@@ -8,7 +8,7 @@ operator_under_test: "{{ lookup('env', 'OPERATOR_UNDER_TEST') | default('helm') 
 app_label_selector: app=memcached
 
 # How many CRs to deploy.
-memcached_cr_count: 25
+memcached_cr_count: 15
 
 # What version of operator-sdk-samples to use for testing.
 # NOTE: Keep in sync with operator RELEASE_VERSION in .github/workflows/CI.
