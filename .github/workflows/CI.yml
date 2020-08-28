@@ -10,7 +10,7 @@ name: CI
 
 jobs:
 
-  kind:
+  kind-ansible:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code.
@@ -29,11 +29,89 @@ jobs:
           # Download release binaries.
           curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
           curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/ansible-operator-${RELEASE_VERSION}-x86_64-linux-gnu
-          curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/helm-operator-${RELEASE_VERSION}-x86_64-linux-gnu
 
           # Install release binaries into /usr/bin.
           chmod +x operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu && sudo cp operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu /usr/bin/operator-sdk && rm operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
           chmod +x ansible-operator-${RELEASE_VERSION}-x86_64-linux-gnu && sudo cp ansible-operator-${RELEASE_VERSION}-x86_64-linux-gnu /usr/bin/ansible-operator && rm ansible-operator-${RELEASE_VERSION}-x86_64-linux-gnu
+        env:
+          # NOTE: Keep in sync with operator_samples_version in main.yml.
+          RELEASE_VERSION: 'v1.0.0'
+
+      - name: Install kind.
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.8.1/kind-linux-amd64
+          chmod +x ./kind
+          chmod +x ./kind && sudo cp ./kind /usr/bin/kind && rm ./kind
+
+      - name: Run molecule default test scenario.
+        run: molecule test
+        env:
+          OPERATOR_UNDER_TEST: ansible
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          SAME_NAME_ROLE_TEST: false
+
+  kind-go:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code.
+        uses: actions/checkout@v2
+
+      - name: Set up Python.
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: Install ansible and other dependencies.
+        run: pip install ansible yamllint docker molecule openshift
+
+      - name: Install operator-sdk.
+        run: |
+          # Download release binaries.
+          curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
+
+          # Install release binaries into /usr/bin.
+          chmod +x operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu && sudo cp operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu /usr/bin/operator-sdk && rm operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
+        env:
+          # NOTE: Keep in sync with operator_samples_version in main.yml.
+          RELEASE_VERSION: 'v1.0.0'
+
+      - name: Install kind.
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.8.1/kind-linux-amd64
+          chmod +x ./kind
+          chmod +x ./kind && sudo cp ./kind /usr/bin/kind && rm ./kind
+
+      - name: Run molecule default test scenario.
+        run: molecule test
+        env:
+          OPERATOR_UNDER_TEST: go
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          SAME_NAME_ROLE_TEST: false
+
+  kind-helm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code.
+        uses: actions/checkout@v2
+
+      - name: Set up Python.
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: Install ansible and other dependencies.
+        run: pip install ansible yamllint docker molecule openshift
+
+      - name: Install operator-sdk.
+        run: |
+          # Download release binaries.
+          curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
+          curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/helm-operator-${RELEASE_VERSION}-x86_64-linux-gnu
+
+          # Install release binaries into /usr/bin.
+          chmod +x operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu && sudo cp operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu /usr/bin/operator-sdk && rm operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
           chmod +x helm-operator-${RELEASE_VERSION}-x86_64-linux-gnu && sudo cp helm-operator-${RELEASE_VERSION}-x86_64-linux-gnu /usr/bin/helm-operator && rm helm-operator-${RELEASE_VERSION}-x86_64-linux-gnu
         env:
           # NOTE: Keep in sync with operator_samples_version in main.yml.
@@ -48,6 +126,7 @@ jobs:
       - name: Run molecule default test scenario.
         run: molecule test
         env:
+          OPERATOR_UNDER_TEST: helm
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           SAME_NAME_ROLE_TEST: false

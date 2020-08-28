@@ -10,6 +10,7 @@ TODO:
 
   1. Install [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/).
   1. Install dependencies: `pip3 install molecule openshift docker`
+  1. Set the operator to test (one of `ansible`, `go`, or `helm`): `export operator_under_test=ansible`
   1. Run: `molecule test`
 
 ## Author

@@ -1,11 +1,8 @@
 ---
 ansible_python_interpreter: '{{ ansible_playbook_python }}'
 
-# Which operators should be tested.
-operators_to_test:
-  - ansible
-  - go
-  - helm
+# Which operator to test.
+operator_under_test: "{{ lookup('env', 'OPERATOR_UNDER_TEST') | default('helm') }}"
 
 # See: https://github.com/operator-framework/operator-sdk-samples/issues/154
 app_label_selector: app=memcached

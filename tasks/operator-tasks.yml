@@ -35,6 +35,10 @@
   delay: 5
   retries: 10
 
+- name: Pause to allow cluster to stabilize.
+  pause:
+    seconds: 10
+
 - name: Deploy {{ memcached_cr_count }} {{ operator_type }} memcached CRs.
   k8s:
     state: present
