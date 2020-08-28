@@ -42,19 +42,7 @@
 - name: Deploy {{ memcached_cr_count }} {{ operator_type }} memcached CRs.
   k8s:
     state: present
-    definition:
-      apiVersion: cache.example.com/v1alpha1
-      kind: Memcached
-      metadata:
-        name: "{{ 'memcached-%02x' | format(item) }}"
-        namespace: default
-      spec:
-        # See: https://github.com/operator-framework/operator-sdk-samples/issues/154#issuecomment-682169402
-        size: 1
-        replicaCount: 1
-        # See: https://github.com/operator-framework/operator-sdk-samples/issues/155
-        image: docker.io/memcached:1.4.36-alpine
-  loop: "{{ range(0, memcached_cr_count) | list }}"
+    definition: "{{ lookup('template', 'templates/memcached-cr.yml.j2') }}"
 
 - name: Wait for {{ memcached_cr_count }} {{ operator_type }} Memcached Pods to be running.
   k8s_info:
