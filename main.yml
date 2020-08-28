@@ -21,6 +21,9 @@
         # mode: 'u=rwX,g=rX,o=rX'
         recurse: true
 
+    - name: Deploy a memcached DaemonSet so image is pulled to all nodes.
+      include_tasks: tasks/memcached-daemonset.yml
+
     - name: Deploy cert-manager (required for Go operator).
       include_tasks: tasks/cert-manager.yml
       when: "'go' in operators_to_test"

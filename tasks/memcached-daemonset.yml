@@ -1,0 +1,34 @@
+---
+- name: Create a Memcached DaemonSet.
+  k8s:
+    state: present
+    wait: true
+    definition:
+      apiVersion: apps/v1
+      kind: DaemonSet
+      metadata:
+        name: memcached
+        namespace: default
+      spec:
+        selector:
+          matchLabels:
+            name: memcached
+        template:
+          metadata:
+            labels:
+              name: memcached
+          spec:
+            tolerations:
+              - key: node-role.kubernetes.io/master
+                effect: NoSchedule
+            containers:
+              - name: memcached
+                image: docker.io/memcached:1.4.36-alpine
+
+- name: Delete the Memcached DaemonSet.
+  k8s:
+    state: absent
+    api_version: apps/v1
+    kind: DaemonSet
+    name: memcached
+    namespace: default
