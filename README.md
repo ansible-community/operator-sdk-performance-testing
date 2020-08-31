@@ -36,6 +36,12 @@ As an example, you can run the tests against [Minikube](https://kubernetes.io/do
      OPERATOR_UNDER_TEST=ansible molecule test
      ```
 
+### Running the tests on an EC2 instance
+
+See https://github.com/geerlingguy/operator-sdk-performance-testing/issues/9
+
+  1. `pip3 install molecule-ec2`
+
 ## How it works
 
 The Ansible playbook in `main.yml` uses a Kind cluster set up by Molecule to build and deploy the `OPERATOR_UNDER_TEST` into the cluster.
