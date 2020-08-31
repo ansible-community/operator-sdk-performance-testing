@@ -1,0 +1,36 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: ec2
+lint: |
+  set -e
+  yamllint .
+platforms:
+  - name: instance
+    image_owner: 099720109477
+    image_name: ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*
+    instance_type: m5.large
+    vpc_subnet_id: subnet-5f845c29
+provisioner:
+  name: ansible
+  env:
+    K8S_AUTH_KUBECONFIG: ${KUBECONFIG:-~/.kube/config}
+    KUBECONFIG: ${KUBECONFIG:-~/.kube/config}
+    OPERATOR_UNDER_TEST: ${OPERATOR_UNDER_TEST:-ansible}
+  config_options:
+    defaults:
+      callback_whitelist: profile_tasks
+    callback_profile_tasks:
+      task_output_limit: 100
+      sort_order: none
+scenario:
+  test_sequence:
+    - lint
+    - cleanup
+    - destroy
+    - create
+    - prepare
+    - converge
+    - cleanup
+    - destroy
