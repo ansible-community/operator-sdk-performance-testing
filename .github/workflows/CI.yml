@@ -123,6 +123,11 @@ jobs:
           chmod +x ./kind
           chmod +x ./kind && sudo cp ./kind /usr/bin/kind && rm ./kind
 
+      - name: Configure Git since we have to patch the Helm example.
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github.actions@example.com"
+
       - name: Run molecule default test scenario.
         run: molecule test -s kind
         env:
