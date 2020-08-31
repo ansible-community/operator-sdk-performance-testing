@@ -35,22 +35,14 @@
   delay: 5
   retries: 10
 
+- name: Pause to allow cluster to stabilize.
+  pause:
+    seconds: 10
+
 - name: Deploy {{ memcached_cr_count }} {{ operator_type }} memcached CRs.
   k8s:
     state: present
-    definition:
-      apiVersion: cache.example.com/v1alpha1
-      kind: Memcached
-      metadata:
-        name: "{{ 'memcached-%02x' | format(item) }}"
-        namespace: default
-      spec:
-        # See: https://github.com/operator-framework/operator-sdk-samples/issues/154#issuecomment-682169402
-        size: 1
-        replicaCount: 1
-        # See: https://github.com/operator-framework/operator-sdk-samples/issues/155
-        image: docker.io/memcached:1.4.36-alpine
-  loop: "{{ range(0, memcached_cr_count) | list }}"
+    definition: "{{ lookup('template', 'templates/memcached-cr.yml.j2') }}"
 
 - name: Wait for {{ memcached_cr_count }} {{ operator_type }} Memcached Pods to be running.
   k8s_info:
@@ -61,7 +53,7 @@
   register: memcached_pods
   until: (memcached_pods.resources | count) == memcached_cr_count
   delay: 5
-  retries: 30
+  retries: 60
 
 - name: Wait for {{ operator_type }} Memcached Pods to be ready.
   command: >
@@ -80,7 +72,3 @@
     chdir: ./operator-sdk-samples/{{ operator_type }}/memcached-operator
   environment:
     IMG: "{{ operator_image }}"
-
-- name: Pause to allow undeploy time to complete.
-  pause:
-    seconds: 10

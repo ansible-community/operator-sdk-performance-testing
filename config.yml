@@ -1,17 +1,14 @@
 ---
 ansible_python_interpreter: '{{ ansible_playbook_python }}'
 
-# Which operators should be tested.
-operators_to_test:
-  - ansible
-  - go
-  - helm
+# Which operator to test.
+operator_under_test: "{{ lookup('env', 'OPERATOR_UNDER_TEST') | default('helm') }}"
 
 # See: https://github.com/operator-framework/operator-sdk-samples/issues/154
 app_label_selector: app=memcached
 
 # How many CRs to deploy.
-memcached_cr_count: 5
+memcached_cr_count: 15
 
 # What version of operator-sdk-samples to use for testing.
 # NOTE: Keep in sync with operator RELEASE_VERSION in .github/workflows/CI.

@@ -1,0 +1,15 @@
+{% for number in range(0, memcached_cr_count) | list %}
+---
+apiVersion: cache.example.com/v1alpha1
+kind: Memcached
+metadata:
+  name: "{{ 'memcached-%02d' | format(number) }}"
+  namespace: default
+spec:
+  # See: https://github.com/operator-framework/operator-sdk-samples/issues/154#issuecomment-682169402
+  size: 1
+  replicaCount: 1
+  # See: https://github.com/operator-framework/operator-sdk-samples/issues/155
+  image: docker.io/memcached:1.4.36-alpine
+
+{% endfor %}

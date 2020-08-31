@@ -19,6 +19,7 @@ provisioner:
   env:
     K8S_AUTH_KUBECONFIG: ${MOLECULE_EPHEMERAL_DIRECTORY}/kubeconfig
     KUBECONFIG: ${MOLECULE_EPHEMERAL_DIRECTORY}/kubeconfig
+    OPERATOR_UNDER_TEST: ${OPERATOR_UNDER_TEST:-ansible}
   config_options:
     defaults:
       callback_whitelist: profile_tasks

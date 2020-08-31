@@ -26,14 +26,14 @@
 
     - name: Deploy cert-manager (required for Go operator).
       include_tasks: tasks/cert-manager.yml
-      when: "'go' in operators_to_test"
+      when: "'go' == operator_under_test"
 
     - name: Deploy prometheus-operator (required for Helm operator).
       include_tasks: tasks/prometheus-operator.yml
-      when: "'helm' in operators_to_test"
+      when: "'helm' == operator_under_test"
 
     - name: Build, deploy, benchmark, and undeploy operators.
       include_tasks: tasks/operator-tasks.yml
-      loop: "{{ operators_to_test }}"
+      loop: ["{{ operator_under_test }}"]
       loop_control:
         loop_var: operator_type
