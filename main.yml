@@ -14,11 +14,18 @@
         dest: ./operator-sdk-samples
         force: true
 
+    # TODO: Remove once the PR is merged.
+    - name: Patch the project so Helm does not get OOMKilled.
+      shell: curl -L https://github.com/operator-framework/operator-sdk-samples/pull/157.patch | git am
+      args:
+        chdir: ./operator-sdk-samples
+        warn: false
+      when: "'helm' == operator_under_test"
+
     - name: Attempt to fix file permissions.
       file:
         dest: ./operator-sdk-samples
         mode: 0777
-        # mode: 'u=rwX,g=rX,o=rX'
         recurse: true
 
     - name: Deploy a memcached DaemonSet so image is pulled to all nodes.

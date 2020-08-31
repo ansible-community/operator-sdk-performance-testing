@@ -44,7 +44,7 @@ jobs:
           chmod +x ./kind && sudo cp ./kind /usr/bin/kind && rm ./kind
 
       - name: Run molecule default test scenario.
-        run: molecule test
+        run: molecule test -s kind
         env:
           OPERATOR_UNDER_TEST: ansible
           PY_COLORS: '1'
@@ -83,7 +83,7 @@ jobs:
           chmod +x ./kind && sudo cp ./kind /usr/bin/kind && rm ./kind
 
       - name: Run molecule default test scenario.
-        run: molecule test
+        run: molecule test -s kind
         env:
           OPERATOR_UNDER_TEST: go
           PY_COLORS: '1'
@@ -124,7 +124,7 @@ jobs:
           chmod +x ./kind && sudo cp ./kind /usr/bin/kind && rm ./kind
 
       - name: Run molecule default test scenario.
-        run: molecule test
+        run: molecule test -s kind
         env:
           OPERATOR_UNDER_TEST: helm
           PY_COLORS: '1'

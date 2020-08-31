@@ -8,11 +8,10 @@ This repository contains some automation code to assist with performance testing
 
   1. Install [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/).
   1. Install Python dependencies: `pip3 install molecule openshift docker`
-  1. Set the operator to test (one of `ansible`, `go`, or `helm`): `export operator_under_test=ansible`
   1. Run the benchmark with Molecule:
 
      ```
-     OPERATOR_UNDER_TEST=ansible molecule test
+     OPERATOR_UNDER_TEST=ansible molecule test -s kind
      ```
 
 You can set `OPERATOR_UNDER_TEST` to one of the following:
@@ -22,6 +21,20 @@ You can set `OPERATOR_UNDER_TEST` to one of the following:
   - `helm`
 
 It is best to run each benchmark individually, in a clean Kind cluster, instead of running one after the other, to ensure the benchmark is as accurate as possible.
+
+### Running the tests on a generic Kubernetes cluster
+
+The `kind` Molecule test scenario manages a Kind instance, but the `default` scenario works with any functional Kubernetes cluster, as long as you can connect to it with a working `KUBECONFIG` file.
+
+As an example, you can run the tests against [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/):
+
+  1. Start a Minikube instance: `minikube start --cpus 4 --memory 8g`
+  2. By default, Minikube adds its configuration to `~/.kube/config`, but if you override that path, make sure to `export KUBECONFIG=/path/to/overridden/kubeconfig`.
+  3. Run the benchmark with Molecule:
+
+     ```
+     OPERATOR_UNDER_TEST=ansible molecule test
+     ```
 
 ## How it works
 
