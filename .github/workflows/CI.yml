@@ -43,13 +43,12 @@ jobs:
           chmod +x ./kind
           chmod +x ./kind && sudo cp ./kind /usr/bin/kind && rm ./kind
 
-      - name: Run molecule default test scenario.
+      - name: Run molecule test scenario.
         run: molecule test -s kind
         env:
           OPERATOR_UNDER_TEST: ansible
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          SAME_NAME_ROLE_TEST: false
 
   kind-go:
     runs-on: ubuntu-latest
@@ -82,13 +81,12 @@ jobs:
           chmod +x ./kind
           chmod +x ./kind && sudo cp ./kind /usr/bin/kind && rm ./kind
 
-      - name: Run molecule default test scenario.
+      - name: Run molecule test scenario.
         run: molecule test -s kind
         env:
           OPERATOR_UNDER_TEST: go
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          SAME_NAME_ROLE_TEST: false
 
   kind-helm:
     runs-on: ubuntu-latest
@@ -128,10 +126,9 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "github.actions@example.com"
 
-      - name: Run molecule default test scenario.
+      - name: Run molecule test scenario.
         run: molecule test -s kind
         env:
           OPERATOR_UNDER_TEST: helm
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          SAME_NAME_ROLE_TEST: false

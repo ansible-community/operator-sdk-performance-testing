@@ -1,0 +1,123 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - vars/main.yml
+
+  module_defaults:
+    group/aws:
+      profile: "{{ aws_profile }}"
+      region: "{{ aws_region }}"
+
+  tasks:
+    - name: Configure VPC.
+      ec2_vpc_net:
+        name: "{{ resource_name }}"
+        cidr_block: 10.0.0.0/16
+        tags:
+          Name: "{{ resource_name }}"
+        tenancy: default
+      register: vpc
+
+    - name: Configure VPC Subnet.
+      ec2_vpc_subnet:
+        az: "{{ aws_region }}a"
+        vpc_id: "{{ vpc.vpc.id }}"
+        cidr: "{{ aws_subnet_cidr }}"
+        map_public: yes
+        tags:
+          Name: "{{ resource_name }}"
+      register: vpc_subnet
+
+    - name: Configure Internet Gateway.
+      ec2_vpc_igw:
+        vpc_id: "{{ vpc.vpc.id }}"
+        tags:
+          Name: "{{ resource_name }}"
+      register: vpc_igw
+
+    - name: Configure public route table.
+      ec2_vpc_route_table:
+        vpc_id: "{{ vpc.vpc.id }}"
+        tags:
+          Name: "{{ resource_name }}"
+        subnets:
+          - "{{ vpc_subnet.subnet.id }}"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: "{{ vpc_igw.gateway_id }}"
+      register: vpc_route_table
+
+    - name: Configure EC2 Security Group.
+      ec2_group:
+        name: "{{ resource_name }}"
+        description: Operator SDK Performance Testing
+        rules:
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: 0.0.0.0/0
+        rules_egress: []
+        vpc_id: "{{ vpc.vpc.id }}"
+
+    - name: Provision EC2 instance.
+      ec2:
+        key_name: "{{ aws_key_name }}"
+        instance_tags:
+          Name: "{{ resource_name }}"
+        group:
+          - "{{ resource_name }}"
+          - default
+        vpc_subnet_id: "{{ vpc_subnet.subnet.id }}"
+        assign_public_ip: true
+        instance_type: m5.large
+        image: "{{ aws_ec2_ami }}"
+        wait: true
+        wait_timeout: 500
+        volumes:
+          - device_name: /dev/sda1
+            volume_type: gp2
+            volume_size: 200
+            delete_on_termination: true
+        exact_count: 1
+        count_tag:
+          Name: "{{ resource_name }}"
+      register: created_instance
+
+    - name: Add EC2 instance to inventory.
+      add_host:
+        name: "{{ item.public_ip }}"
+        groups: "aws,{{ item.tags.Name }}"
+        ansible_user: ubuntu
+        ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+      with_items: "{{ created_instance.tagged_instances }}"
+
+- hosts: aws
+  gather_facts: false
+  become: true
+
+  handlers:
+    - name: reboot
+      reboot:
+
+  tasks:
+    - name: Wait for host to become available.
+      wait_for_connection:
+
+    - name: Gather facts.
+      setup:
+
+    - name: Upgrade everything on the server.
+      apt:
+        upgrade: dist
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Notify reboot handler if a reboot is required.
+      shell: "[ -f /var/run/reboot-required ]"
+      failed_when: false
+      register: reboot_required
+      changed_when: reboot_required.rc == 0
+      notify: reboot

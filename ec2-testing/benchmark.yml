@@ -1,0 +1,92 @@
+---
+- name: Prepare host for benchmark.
+  hosts: operator_sdk_perftest
+  become: true
+
+  vars:
+    operator_sdk_version: v1.0.0
+    kind_version: v0.8.1
+    kubectl_version: v1.19.0
+
+  pre_tasks:
+    - name: Ensure apt caches are up to date.
+      apt:
+        update_cache: true
+
+  roles:
+    - role: geerlingguy.docker
+
+  tasks:
+    - name: Install required packages.
+      apt:
+        name:
+          - golang
+          - python3-pip
+        state: present
+
+    - name: Install test dependencies.
+      pip:
+        name:
+          - ansible
+          - yamllint
+          - docker
+          - molecule
+          - openshift
+        state: present
+
+    - name: Download kubectl.
+      get_url:
+        url: https://storage.googleapis.com/kubernetes-release/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
+        dest: /usr/bin/kubectl
+        mode: 0755
+
+    - name: Download Operator SDK.
+      get_url:
+        url: "https://github.com/operator-framework/operator-sdk/releases/download/{{ operator_sdk_version }}/{{ item }}-{{ operator_sdk_version }}-x86_64-linux-gnu"
+        dest: /usr/bin/{{ item }}
+        mode: 0755
+      loop:
+        - operator-sdk
+        - ansible-operator
+        - helm-operator
+
+    - name: Download Kind.
+      get_url:
+        url: https://kind.sigs.k8s.io/dl/{{ kind_version }}/kind-linux-amd64
+        dest: /usr/bin/kind
+        mode: 0755
+
+- name: Run benchmark.
+  hosts: operator_sdk_perftest
+  become: true
+
+  tasks:
+    - name: Clone operator-sdk-performance-testing project.
+      git:
+        repo: https://github.com/geerlingguy/operator-sdk-performance-testing.git
+        version: master
+        dest: ~/operator-sdk-performance-testing
+
+    - name: Run molecule test scenarios.
+      command: molecule test -s kind
+      args:
+        chdir: ~/operator-sdk-performance-testing
+      environment:
+        OPERATOR_UNDER_TEST: "{{ item }}"
+      register: molecule_result
+      tags: ['molecule']
+      loop:
+        - ansible
+        - go
+        - helm
+
+    - name: Store results in a local result file.
+      copy:
+        content: "{{ item.stdout }}"
+        dest: "./result-{{ item.item }}.txt"
+        mode: 0664
+      loop: "{{ molecule_result.results }}"
+      delegate_to: localhost
+      no_log: true
+      become: false
+      tags: ['molecule']
