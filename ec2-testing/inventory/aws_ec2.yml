@@ -1,0 +1,19 @@
+---
+plugin: aws_ec2
+
+ansible_user: ubuntu
+
+boto_profile: aworks
+
+regions:
+  - us-east-1
+
+hostnames:
+  - ip-address
+
+filters:
+  tag:Name: operator_sdk_perftest
+
+keyed_groups:
+  - key: tags.Name
+    separator: ''

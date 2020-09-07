@@ -1,0 +1,7 @@
+---
+aws_profile: aworks # Ansible AWS Account
+aws_region: us-east-1 # North Virginia
+aws_ec2_ami: ami-05cf2c352da0bfb2e # Ubuntu 20.04
+aws_key_name: geerlingguy
+aws_subnet_cidr: 10.0.1.0/24
+resource_name: operator_sdk_perftest
