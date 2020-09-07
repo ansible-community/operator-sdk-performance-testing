@@ -36,6 +36,12 @@ As an example, you can run the tests against [Minikube](https://kubernetes.io/do
      OPERATOR_UNDER_TEST=ansible molecule test
      ```
 
+### Running the tests on an Amazon EC2 instance
+
+This project includes a set of playbooks to build an EC2 instance, install the prerequisites on it, then run the benchmarks on it.
+
+See the [ec2-testing README](ec2-testing/README.md) for details.
+
 ## How it works
 
 The Ansible playbook in `main.yml` uses a Kind cluster set up by Molecule to build and deploy the `OPERATOR_UNDER_TEST` into the cluster.
