@@ -39,8 +39,8 @@
   register: operator_pod
   failed_when: false
   until: operator_pod.resources[0].status.phase == 'Running'
-  delay: 5
-  retries: 10
+  delay: 3
+  retries: 15
 
 - name: Pause to allow cluster to stabilize.
   pause:
@@ -51,7 +51,7 @@
     state: present
     definition: "{{ lookup('template', 'templates/memcached-cr.yml.j2') }}"
 
-- name: Wait for {{ memcached_cr_count }} {{ operator_type }} Memcached Pods to be running.
+- name: B1 Wait for {{ memcached_cr_count }} {{ operator_type }} Memcached Pods to be running.
   k8s_info:
     api_version: v1
     kind: Pod
@@ -59,10 +59,10 @@
       - "{{ app_label_selector }}"
   register: memcached_pods
   until: (memcached_pods.resources | count) == memcached_cr_count
-  delay: 5
-  retries: 60
+  delay: 3
+  retries: 120
 
-- name: Wait for {{ operator_type }} Memcached Pods to be ready.
+- name: B1 Wait for {{ operator_type }} Memcached Pods to be ready.
   command: >
     kubectl wait --for=condition=Ready
     pods --selector {{ app_label_selector }} --timeout=300s
@@ -70,6 +70,24 @@
 
 # TODO: Kill Operator Pod, benchmark re-reconciliation.
 # See: https://github.com/geerlingguy/operator-sdk-performance-testing/issues/4
+- name: B2 Wait for re-reconciliation to complete.
+  meta: noop
+
+- name: Un-deploy {{ memcached_cr_count }} {{ operator_type }} memcached CRs.
+  k8s:
+    state: absent
+    definition: "{{ lookup('template', 'templates/memcached-cr.yml.j2') }}"
+
+- name: B3 Wait for all {{ operator_type }} Memcached Pods to be gone.
+  k8s_info:
+    api_version: v1
+    kind: Pod
+    label_selectors:
+      - "{{ app_label_selector }}"
+  register: memcached_pods
+  until: (memcached_pods.resources | count) == 0
+  delay: 5
+  retries: 120
 
 - name: Undeploy the {{ operator_type }} memcached operator.
   command: make undeploy
