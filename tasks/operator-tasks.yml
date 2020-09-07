@@ -8,6 +8,13 @@
     app_label_selector: app.kubernetes.io/name=memcached
   when: operator_type == 'helm'
 
+- name: Ensure the operator namespace exists.
+  k8s:
+    name: memcached-operator-system
+    api_version: v1
+    kind: Namespace
+    state: present
+
 - name: Build, push, and deploy the {{ operator_type }} memcached operator.
   shell: "{{ item }}"
   args:
