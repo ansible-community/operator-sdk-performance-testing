@@ -11,7 +11,7 @@ Make sure you have `boto` installed locally: `pip3 install boto`.
 Install requirements:
 
 ```
-ansible-galaxy install -r requirements.yml
+$ ansible-galaxy install -r requirements.yml
 ```
 
 Build the environment:
