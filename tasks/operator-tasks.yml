@@ -46,39 +46,67 @@
   pause:
     seconds: 10
 
+# Benchmark 1: Deploy Memcached CRs.
 - name: Deploy {{ memcached_cr_count }} {{ operator_type }} memcached CRs.
   k8s:
     state: present
     definition: "{{ lookup('template', 'templates/memcached-cr.yml.j2') }}"
 
-- name: B1 Wait for {{ memcached_cr_count }} {{ operator_type }} Memcached Pods to be running.
+- name: "[B1] Wait for {{ memcached_cr_count }} {{ operator_type }} Memcached Pods to be running."
   k8s_info:
     api_version: v1
     kind: Pod
     label_selectors:
       - "{{ app_label_selector }}"
   register: memcached_pods
-  until: (memcached_pods.resources | count) == memcached_cr_count
+  until: (memcached_pods.resources | count) >= memcached_cr_count
   delay: 3
   retries: 120
 
-- name: B1 Wait for {{ operator_type }} Memcached Pods to be ready.
+- name: "[B1] Wait for {{ operator_type }} Memcached Pods to be ready."
   command: >
     kubectl wait --for=condition=Ready
     pods --selector {{ app_label_selector }} --timeout=300s
   changed_when: false
 
-# TODO: Kill Operator Pod, benchmark re-reconciliation.
-# See: https://github.com/geerlingguy/operator-sdk-performance-testing/issues/4
-- name: B2 Wait for re-reconciliation to complete.
-  meta: noop
+# Benchmark 2: Kill Operator Pod, benchmark re-reconciliation.
+- name: Add one more CR to the count.
+  set_fact:
+    memcached_cr_count: "{{ memcached_cr_count + 1 }}"
 
+- name: Delete the {{ operator_type }} pod so it restarts.
+  k8s:
+    state: absent
+    api_version: v1
+    kind: Pod
+    name: "{{ operator_pod.resources[0].metadata.name }}"
+    namespace: memcached-operator-system
+    wait: false
+
+- name: Deploy {{ memcached_cr_count }} {{ operator_type }} memcached CRs.
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'templates/memcached-cr.yml.j2') }}"
+    wait: false
+
+- name: "[B2] Wait for {{ memcached_cr_count }} {{ operator_type }} Memcached Pods to be running."
+  k8s_info:
+    api_version: v1
+    kind: Pod
+    label_selectors:
+      - "{{ app_label_selector }}"
+  register: memcached_pods
+  until: (memcached_pods.resources | count) == memcached_cr_count | int
+  delay: 3
+  retries: 120
+
+# Benchmark 3: Benchmark how long it takes to remove all pods.
 - name: Un-deploy {{ memcached_cr_count }} {{ operator_type }} memcached CRs.
   k8s:
     state: absent
     definition: "{{ lookup('template', 'templates/memcached-cr.yml.j2') }}"
 
-- name: B3 Wait for all {{ operator_type }} Memcached Pods to be gone.
+- name: "[B3] Wait for all {{ operator_type }} Memcached Pods to be gone."
   k8s_info:
     api_version: v1
     kind: Pod

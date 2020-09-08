@@ -1,4 +1,4 @@
-{% for number in range(0, memcached_cr_count) | list %}
+{% for number in range(0, memcached_cr_count | int) | list %}
 ---
 apiVersion: cache.example.com/v1alpha1
 kind: Memcached
