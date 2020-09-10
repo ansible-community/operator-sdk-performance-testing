@@ -117,11 +117,11 @@
   delay: 5
   retries: 120
 
-- name: Undeploy the {{ operator_type }} memcached operator.
-  command: make undeploy
-  async: 10
-  poll: 0
-  args:
-    chdir: ./operator-sdk-samples/{{ operator_type }}/memcached-operator
-  environment:
-    IMG: "{{ operator_image }}"
+# - name: Undeploy the {{ operator_type }} memcached operator.
+#   command: make undeploy
+#   async: 10
+#   poll: 0
+#   args:
+#     chdir: ./operator-sdk-samples/{{ operator_type }}/memcached-operator
+#   environment:
+#     IMG: "{{ operator_image }}"

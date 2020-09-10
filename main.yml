@@ -7,12 +7,12 @@
     - config.yml
 
   tasks:
-    - name: Clone the operator-sdk-samples project.
-      git:
-        repo: https://github.com/operator-framework/operator-sdk-samples.git
-        version: "{{ operator_samples_version }}"
-        dest: ./operator-sdk-samples
-        force: true
+    # - name: Clone the operator-sdk-samples project.
+    #   git:
+    #     repo: https://github.com/operator-framework/operator-sdk-samples.git
+    #     version: "{{ operator_samples_version }}"
+    #     dest: ./operator-sdk-samples
+    #     force: true
 
     # TODO: Remove once the PR is merged.
     - name: Patch the project so Helm does not get OOMKilled.
