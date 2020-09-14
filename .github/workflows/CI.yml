@@ -43,6 +43,11 @@ jobs:
           chmod +x ./kind
           chmod +x ./kind && sudo cp ./kind /usr/bin/kind && rm ./kind
 
+      - name: Configure Git since we have to patch the examples.
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github.actions@example.com"
+
       - name: Run molecule test scenario.
         run: molecule test -s kind
         env:
@@ -80,6 +85,11 @@ jobs:
           curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.8.1/kind-linux-amd64
           chmod +x ./kind
           chmod +x ./kind && sudo cp ./kind /usr/bin/kind && rm ./kind
+
+      - name: Configure Git since we have to patch the examples.
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github.actions@example.com"
 
       - name: Run molecule test scenario.
         run: molecule test -s kind
@@ -121,7 +131,7 @@ jobs:
           chmod +x ./kind
           chmod +x ./kind && sudo cp ./kind /usr/bin/kind && rm ./kind
 
-      - name: Configure Git since we have to patch the Helm example.
+      - name: Configure Git since we have to patch the examples.
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "github.actions@example.com"
