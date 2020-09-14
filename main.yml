@@ -14,13 +14,12 @@
         dest: ./operator-sdk-samples
         force: true
 
-    # TODO: Remove once the PR is merged.
-    - name: Patch the project so Helm does not get OOMKilled.
-      shell: curl -L https://github.com/operator-framework/operator-sdk-samples/pull/157.patch | git am
+    - name: Apply patches to the operator-sdk-samples project.
+      shell: "curl -L {{ item }} | git am"
       args:
         chdir: ./operator-sdk-samples
         warn: false
-      when: "'helm' == operator_under_test"
+      loop: "{{ patches_to_apply }}"
 
     - name: Attempt to fix file permissions.
       file:
