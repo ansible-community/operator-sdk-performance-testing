@@ -1,6 +1,6 @@
 # Operator SDK Performance Testing
 
-[![CI](https://github.com/geerlingguy/operator-sdk-performance-testing/workflows/CI/badge.svg?branch=master)](https://github.com/geerlingguy/operator-sdk-performance-testing/actions?query=workflow%3ACI)
+[![CI](https://github.com/ansible-community/operator-sdk-performance-testing/workflows/CI/badge.svg?branch=main)](https://github.com/ansible-community/operator-sdk-performance-testing/actions?query=workflow%3ACI)
 
 This repository contains some automation code to assist with performance testing for some aspects of the Kubernetes [Operator SDK](https://github.com/operator-framework/operator-sdk).
 
