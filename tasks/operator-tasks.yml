@@ -127,6 +127,6 @@
   async: 10
   poll: 0
   args:
-    chdir: ./operator-sdk-samples/{{ operator_type }}/memcached-operator
+    chdir: ./operator-sdk/{{ operator_type }}/memcached-operator
   environment:
     IMG: "{{ operator_image }}"
