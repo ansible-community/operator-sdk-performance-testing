@@ -15,10 +15,15 @@
     kind: Namespace
     state: present
 
+- name: Set the correct subdirectory for the Go operator example.
+  set_fact:
+    operator_subdir: v2/memcached-operator
+  when: operator_type == 'go'
+
 - name: Build, push, and deploy the {{ operator_type }} memcached operator.
   shell: "{{ item }}"
   args:
-    chdir: ./operator-sdk-samples/{{ operator_type }}/memcached-operator
+    chdir: ./operator-sdk/testdata/{{ operator_type }}/{{ operator_subdir }}
   with_items:
     # Can't use make for docker-build target because of Go operator test dep.
     - docker build . -t $IMG
@@ -122,6 +127,6 @@
   async: 10
   poll: 0
   args:
-    chdir: ./operator-sdk-samples/{{ operator_type }}/memcached-operator
+    chdir: ./operator-sdk/{{ operator_type }}/memcached-operator
   environment:
     IMG: "{{ operator_image }}"

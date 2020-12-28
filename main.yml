@@ -7,23 +7,16 @@
     - config.yml
 
   tasks:
-    - name: Clone the operator-sdk-samples project.
+    - name: Clone the operator-sdk project.
       git:
-        repo: https://github.com/operator-framework/operator-sdk-samples.git
+        repo: https://github.com/operator-framework/operator-sdk.git
         version: "{{ operator_samples_version }}"
-        dest: ./operator-sdk-samples
+        dest: ./operator-sdk
         force: true
-
-    - name: Apply patches to the operator-sdk-samples project.
-      shell: "curl -L {{ item }} | git am"
-      args:
-        chdir: ./operator-sdk-samples
-        warn: false
-      loop: "{{ patches_to_apply }}"
 
     - name: Attempt to fix file permissions.
       file:
-        dest: ./operator-sdk-samples
+        dest: ./operator-sdk
         mode: 0777
         recurse: true
 
@@ -34,9 +27,8 @@
       include_tasks: tasks/cert-manager.yml
       when: "'go' == operator_under_test"
 
-    - name: Deploy prometheus-operator (required for Helm operator).
+    - name: Deploy prometheus-operator (required for metrics service).
       include_tasks: tasks/prometheus-operator.yml
-      when: "'helm' == operator_under_test"
 
     - name: Build, deploy, benchmark, and undeploy operators.
       include_tasks: tasks/operator-tasks.yml
